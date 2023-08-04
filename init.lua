@@ -37,9 +37,6 @@ These are for you, the reader to help understand what is happening. Feel free to
 them once you know what you're doing, but they should serve as a guide for when you
 are first encountering a few different constructs in your nvim config.
 
-I hope you enjoy your Neovim journey,
-- TJ
-
 P.S. You can delete this when you're done too. It's your config now :)
 --]]
 -- Set <space> as the leader key
@@ -249,6 +246,7 @@ require('lazy').setup({
 }, {})
 
 
+-- NVIM-TREE SETUP
 local function my_on_attach(bufnr)
   local api = require "nvim-tree.api"
 
@@ -256,7 +254,8 @@ local function my_on_attach(bufnr)
   api.config.mappings.default_on_attach(bufnr)
 
   -- custom mappings
-  vim.keymap.set('n', '<leader>e', api.tree.toggle, { desc = 'nvim-tree:toggle-tree' })
+  vim.keymap.set('n', '<leader>et', api.tree.toggle, { desc = 'nvim-tree:toggle-tree' })
+  vim.keymap.set('n', '<leader>ef', api.tree.focus, { desc = 'nvim-tree:focus-tree' })
   -- you can do something similar like so:
   -- vim.cmd('nnoremap <space>e :NvimTreeToggle<CR>')
 end
@@ -267,7 +266,7 @@ require("nvim-tree").setup {
   on_attach = my_on_attach,
   actions = {
     open_file = {
-      quit_on_open = true,
+      quit_on_open = false,
     }
   },
   git = {
@@ -281,8 +280,25 @@ require("nvim-tree").setup {
       },
     },
   }
-  ---
 }
+
+-- NVIM-TREE SETUP Auto close
+vim.api.nvim_create_autocmd("QuitPre", {
+  callback = function()
+    local invalid_win = {}
+    local wins = vim.api.nvim_list_wins()
+    for _, w in ipairs(wins) do
+      local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(w))
+      if bufname:match("NvimTree_") ~= nil then
+        table.insert(invalid_win, w)
+      end
+    end
+    if #invalid_win == #wins - 1 then
+      -- Should quit, so we close all invalid windows.
+      for _, w in ipairs(invalid_win) do vim.api.nvim_win_close(w, true) end
+    end
+  end
+})
 
 require("auto-save").setup {
 }
