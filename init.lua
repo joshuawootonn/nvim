@@ -250,12 +250,16 @@ require('lazy').setup({
 local function my_on_attach(bufnr)
   local api = require "nvim-tree.api"
 
+  local function find_and_focus() 
+    api.tree.find_file()
+    api.tree.focus()
+  end
   -- default mappings
   api.config.mappings.default_on_attach(bufnr)
 
   -- custom mappings
   vim.keymap.set('n', '<leader>et', api.tree.toggle, { desc = 'nvim-tree:toggle-tree' })
-  vim.keymap.set('n', '<leader>ef', api.tree.focus, { desc = 'nvim-tree:focus-tree' })
+  vim.keymap.set('n', '<leader>ef', find_and_focus, { desc = 'nvim-tree:find_file + nvim-tree:focus' })
   -- you can do something similar like so:
   -- vim.cmd('nnoremap <space>e :NvimTreeToggle<CR>')
 end
